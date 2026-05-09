@@ -2,15 +2,10 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import {
-
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { PayoutAction } from "./payout-action";
+import { CreatePayoutForm } from "./create-payout-form";
 
 export default async function AdminPayoutsPage() {
   const payouts = await prisma.payout.findMany({
@@ -18,14 +13,23 @@ export default async function AdminPayoutsPage() {
     include: { worker: { select: { name: true, email: true } } },
   });
 
+  const workers = await prisma.user.findMany({
+    where: { role: "WORKER", isApproved: true },
+    select: { id: true, name: true, email: true },
+    orderBy: { name: "asc" },
+  });
+
   const totalPending = payouts.filter((p) => !p.isPaid).reduce((s, p) => s + p.amount, 0);
   const totalPaid = payouts.filter((p) => p.isPaid).reduce((s, p) => s + p.amount, 0);
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Payouts</h1>
-        <p className="text-sm text-muted-foreground mt-1">{payouts.length} records</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Payouts</h1>
+          <p className="text-sm text-muted-foreground mt-1">{payouts.length} records</p>
+        </div>
+        <CreatePayoutForm workers={workers} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -45,7 +49,6 @@ export default async function AdminPayoutsPage() {
             <TableRow>
               <TableHead>Worker</TableHead>
               <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Expected</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Paid At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -60,9 +63,6 @@ export default async function AdminPayoutsPage() {
                 </TableCell>
                 <TableCell className="text-right font-mono text-sm">
                   ${payout.amount.toLocaleString()}
-                </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  {payout.expectedDate ? new Date(payout.expectedDate).toLocaleDateString() : "—"}
                 </TableCell>
                 <TableCell>
                   <Badge variant={payout.isPaid ? "success" : "warning"}>
@@ -79,8 +79,8 @@ export default async function AdminPayoutsPage() {
             ))}
             {payouts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                  No payouts yet.
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                  No payouts yet. Click "Add Payout" to create one.
                 </TableCell>
               </TableRow>
             )}

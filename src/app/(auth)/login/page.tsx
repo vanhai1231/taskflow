@@ -41,7 +41,18 @@ export default function LoginPage() {
           setError(result.error);
         }
       } else {
-        router.push("/worker/tasks");
+        // Fetch session to get role
+        const sessionRes = await fetch("/api/auth/session");
+        const sessionData = await sessionRes.json();
+        const userRole = sessionData?.user?.role;
+        
+        if (userRole === "ADMIN") {
+          router.push("/admin");
+        } else if (userRole === "REVIEWER") {
+          router.push("/reviewer/submissions");
+        } else {
+          router.push("/worker/tasks");
+        }
         router.refresh();
       }
     } catch {

@@ -105,6 +105,29 @@ export async function markPayoutPaid(payoutId: string) {
   revalidatePath("/worker/payouts");
 }
 
+export async function createPayout(formData: FormData) {
+  await requireAdmin();
+
+  const workerId = formData.get("workerId") as string;
+  const amount = parseFloat(formData.get("amount") as string);
+  const description = formData.get("description") as string;
+
+  if (!workerId || !amount || amount <= 0) {
+    throw new Error("Worker and valid amount are required");
+  }
+
+  await prisma.payout.create({
+    data: {
+      workerId,
+      amount,
+      expectedDate: new Date(),
+    },
+  });
+
+  revalidatePath("/admin/payouts");
+  revalidatePath("/worker/payouts");
+}
+
 export async function approveUser(userId: string) {
   await requireAdmin();
 

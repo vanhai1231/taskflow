@@ -46,7 +46,7 @@ export function Navbar() {
     navItems.push({ href: "/reviewer/submissions", label: "Review" });
   }
 
-  if (user) {
+  if (role === "WORKER" || role === "REVIEWER") {
     navItems.push(
       { href: "/worker/tasks", label: "Task Board" },
       { href: "/worker/my-tasks", label: "My Tasks" },
