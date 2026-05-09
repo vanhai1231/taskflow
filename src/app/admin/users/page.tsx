@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/table";
 import { RoleChanger } from "./role-changer";
 import { ApproveButton } from "./approve-button";
+import { DeleteUserButton } from "./delete-button";
 
 export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({
@@ -38,18 +39,14 @@ export default async function AdminUsersPage() {
                 <div className="min-w-0">
                   <p className="font-medium">{user.name || "—"}</p>
                   <p className="text-sm text-muted-foreground">{user.email}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    {user.isEmailVerified ? (
-                      <Badge variant="success" className="text-[10px]">Email Verified</Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-[10px]">Email Unverified</Badge>
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                      Registered {new Date(user.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    Registered {new Date(user.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
-                <ApproveButton userId={user.id} />
+                <div className="flex items-center gap-2">
+                  <ApproveButton userId={user.id} />
+                  <DeleteUserButton userId={user.id} userName={user.name || user.email} />
+                </div>
               </div>
             ))}
           </div>
@@ -92,7 +89,10 @@ export default async function AdminUsersPage() {
                   </TableCell>
                   <TableCell className="text-center">{user.reputation}</TableCell>
                   <TableCell className="text-right">
-                    <RoleChanger userId={user.id} currentRole={user.role} />
+                    <div className="flex items-center justify-end gap-2">
+                      <RoleChanger userId={user.id} currentRole={user.role} />
+                      <DeleteUserButton userId={user.id} userName={user.name || user.email} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

@@ -138,3 +138,14 @@ export async function approveUser(userId: string) {
 
   revalidatePath("/admin/users");
 }
+
+export async function deleteUser(userId: string) {
+  await requireAdmin();
+
+  // Delete related data first
+  await prisma.submission.deleteMany({ where: { workerId: userId } });
+  await prisma.payout.deleteMany({ where: { workerId: userId } });
+  await prisma.user.delete({ where: { id: userId } });
+
+  revalidatePath("/admin/users");
+}
