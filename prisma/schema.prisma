@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  REVIEWER
+  WORKER
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CLOSED
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REVISION_REQUESTED
+}
+
+model User {
+  id                String       @id @default(uuid())
+  email             String       @unique
+  password          String       // Hashed with bcrypt
+  name              String?
+  role              Role         @default(WORKER)
+  reputation        Int          @default(0)
+  isApproved        Boolean      @default(false)
+  isEmailVerified   Boolean      @default(false)
+  verificationCode  String?
+  tasks             Task[]
+  submissions       Submission[]
+  payouts           Payout[]
+  createdAt         DateTime     @default(now())
+}
+
+model Task {
+  id               String       @id @default(uuid())
+  title            String
+  description      String       @db.Text
+  datasetUrl       String
+  baselineScore    Float
+  rewardAmount     Float
+  expectedPayout   DateTime?
+  deadline         DateTime?
+  status           TaskStatus   @default(OPEN)
+  createdBy        String
+  admin            User         @relation(fields: [createdBy], references: [id])
+  submissions      Submission[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model Submission {
+  id               String           @id @default(uuid())
+  taskId           String
+  workerId         String
+  resultUrl        String
+  status           SubmissionStatus @default(PENDING)
+  reviewerComment  String?          @db.Text
+  score            Float?
+  task             Task             @relation(fields: [taskId], references: [id])
+  worker           User             @relation(fields: [workerId], references: [id])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Payout {
+  id               String       @id @default(uuid())
+  workerId         String
+  amount           Float
+  isPaid           Boolean      @default(false)
+  expectedDate     DateTime?
+  paidAt           DateTime?
+  worker           User         @relation(fields: [workerId], references: [id])
+  createdAt        DateTime     @default(now())
+}
