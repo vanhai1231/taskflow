@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { sendVerificationEmail, generateCode } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,9 +13,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
+    if (password.length < 3) {
       return NextResponse.json(
-        { error: "Password must be at least 6 characters" },
+        { error: "Password must be at least 3 characters" },
         { status: 400 }
       );
     }
@@ -33,7 +32,6 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await hash(password, 12);
-    const code = generateCode();
 
     const user = await prisma.user.create({
       data: {
@@ -42,17 +40,13 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         role: "WORKER",
         isApproved: false,
-        isEmailVerified: false,
-        verificationCode: code,
+        isEmailVerified: true, // Skip email verification
       },
     });
 
-    // Send verification email
-    await sendVerificationEmail(email, code, name);
-
     return NextResponse.json(
       {
-        message: "Account created. Please check your email for the verification code.",
+        message: "Account created. Waiting for admin approval.",
         userId: user.id,
         email: user.email,
       },

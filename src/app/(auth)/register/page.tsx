@@ -1,21 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +25,8 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (password.length < 3) {
+      setError("Password must be at least 3 characters");
       return;
     }
 
@@ -45,8 +44,7 @@ export default function RegisterPage() {
       if (!res.ok) {
         setError(data.error || "Registration failed");
       } else {
-        // Redirect to verify page with email
-        router.push(`/verify?email=${encodeURIComponent(email)}`);
+        setSuccess(true);
       }
     } catch {
       setError("An unexpected error occurred");
@@ -54,6 +52,31 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-6">
+        <div className="w-full max-w-sm text-center space-y-4">
+          <CheckCircle2 className="h-12 w-12 mx-auto text-emerald-500" />
+          <h1 className="text-2xl font-bold">Account created!</h1>
+          <div className="rounded-lg border p-4 space-y-2">
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Pending admin approval</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your account will be activated once an admin reviews and approves it.
+            </p>
+          </div>
+          <Link href="/login">
+            <Button variant="outline" className="rounded-full mt-2">
+              Back to Sign In
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-6">
@@ -83,7 +106,7 @@ export default function RegisterPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={3} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>

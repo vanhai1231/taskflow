@@ -40,10 +40,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid password");
         }
 
-        if (!user.isEmailVerified) {
-          throw new Error("EMAIL_NOT_VERIFIED");
-        }
-
         if (!user.isApproved) {
           throw new Error("ACCOUNT_PENDING_APPROVAL");
         }
