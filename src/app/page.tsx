@@ -1,42 +1,13 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowRight, Zap, Shield, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef } from "react";
-
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("reveal-visible");
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    const children = el.querySelectorAll(".reveal-item");
-    children.forEach((child) => observer.observe(child));
-    return () => observer.disconnect();
-  }, []);
-  return ref;
-}
 
 export default function HomePage() {
-  const featuresRef = useScrollReveal();
-  const stepsRef = useScrollReveal();
-
   return (
     <div className="flex flex-col items-center overflow-hidden">
       {/* Hero */}
       <section className="w-full relative">
-        {/* Subtle gradient orb */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-white/[0.03] to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none opacity-[0.03]" style={{ background: "radial-gradient(circle, white, transparent)" }} />
 
         <div className="mx-auto max-w-3xl px-6 py-32 text-center relative">
           <p className="text-sm font-medium text-muted-foreground mb-4 animate-fade-in-up">
@@ -70,12 +41,12 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="w-full py-24 border-t" ref={featuresRef}>
+      <section className="w-full py-24 border-t">
         <div className="mx-auto max-w-5xl px-6">
-          <p className="text-center text-sm font-medium text-muted-foreground mb-3 reveal-item">
+          <p className="text-center text-sm font-medium text-muted-foreground mb-3 animate-fade-in-up animation-delay-100">
             Everything you need
           </p>
-          <h2 className="text-center text-3xl sm:text-4xl font-bold tracking-tight mb-16 reveal-item">
+          <h2 className="text-center text-3xl sm:text-4xl font-bold tracking-tight mb-16 animate-fade-in-up animation-delay-200">
             Built for productivity.
           </h2>
 
@@ -86,24 +57,26 @@ export default function HomePage() {
                 title: "Tasks",
                 description: "Create challenges with datasets, baseline scores, and deadlines. Workers discover and claim open tasks in real-time.",
                 gradient: "from-amber-500/20 to-orange-500/20",
+                delay: "animation-delay-100",
               },
               {
                 icon: Shield,
                 title: "Review",
                 description: "Reviewers evaluate submissions with scores and detailed feedback. Approve, reject, or request revisions seamlessly.",
                 gradient: "from-blue-500/20 to-cyan-500/20",
+                delay: "animation-delay-200",
               },
               {
                 icon: CreditCard,
                 title: "Payouts",
                 description: "Transparent payout management. Admin creates payouts, workers track earnings — all in one clean interface.",
                 gradient: "from-emerald-500/20 to-green-500/20",
+                delay: "animation-delay-300",
               },
             ].map((feature, i) => (
               <div
                 key={i}
-                className="reveal-item group rounded-2xl border bg-card p-8 transition-all duration-500 hover:border-foreground/20 hover:shadow-2xl hover:shadow-white/5 hover:-translate-y-1"
-                style={{ transitionDelay: `${i * 100}ms` }}
+                className={`animate-fade-in-up ${feature.delay} group rounded-2xl border bg-card p-8 transition-all duration-500 hover:border-foreground/20 hover:shadow-2xl hover:shadow-white/5 hover:-translate-y-1`}
               >
                 <div className={`inline-flex rounded-xl bg-gradient-to-br ${feature.gradient} p-3 mb-5`}>
                   <feature.icon className="h-6 w-6 text-foreground" />
@@ -119,17 +92,16 @@ export default function HomePage() {
       </section>
 
       {/* How it works */}
-      <section className="w-full py-24 border-t" ref={stepsRef}>
+      <section className="w-full py-24 border-t">
         <div className="mx-auto max-w-4xl px-6">
-          <p className="text-center text-sm font-medium text-muted-foreground mb-3 reveal-item">
+          <p className="text-center text-sm font-medium text-muted-foreground mb-3">
             Simple workflow
           </p>
-          <h2 className="text-center text-3xl sm:text-4xl font-bold tracking-tight mb-16 reveal-item">
+          <h2 className="text-center text-3xl sm:text-4xl font-bold tracking-tight mb-16">
             How it works.
           </h2>
 
           <div className="grid gap-0 md:grid-cols-4 relative">
-            {/* Connecting line */}
             <div className="hidden md:block absolute top-8 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
             {[
@@ -138,12 +110,8 @@ export default function HomePage() {
               { step: "03", title: "Submit", desc: "Upload solution.py and submission.csv" },
               { step: "04", title: "Pay", desc: "Admin reviews and creates payout" },
             ].map((item, i) => (
-              <div
-                key={i}
-                className="reveal-item text-center px-4 py-6"
-                style={{ transitionDelay: `${i * 150}ms` }}
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-foreground/10 bg-card mb-4 group-hover:border-foreground/30 transition-colors relative z-10">
+              <div key={i} className="text-center px-4 py-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-foreground/10 bg-card mb-4 transition-colors relative z-10">
                   <span className="text-sm font-bold text-muted-foreground">{item.step}</span>
                 </div>
                 <h3 className="font-semibold mb-1">{item.title}</h3>
