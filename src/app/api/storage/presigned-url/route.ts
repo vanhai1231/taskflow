@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { s3Client, R2_BUCKET_NAME, R2_PUBLIC_URL } from "@/lib/s3";
-import { v4 as uuidv4 } from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
