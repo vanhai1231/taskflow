@@ -74,49 +74,84 @@ export function TaskTabs({
 
       {/* Description tab */}
       <TabsContent value="description" className="pt-6">
-        <div className="prose prose-sm dark:prose-invert max-w-none">
-          <h2 className="text-lg font-semibold mb-3">Overview</h2>
-          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-            {description}
-          </div>
+        <div className="max-w-none space-y-4">
+          {description.split("\n\n").map((block, i) => {
+            const trimmed = block.trim();
+            if (!trimmed) return null;
+
+            // Heading detection
+            if (trimmed.length < 60 && !trimmed.includes(".") && !trimmed.startsWith("-") && !trimmed.startsWith("•")) {
+              return (
+                <h3 key={i} className="text-base font-semibold mt-6 mb-2 text-foreground">
+                  {trimmed}
+                </h3>
+              );
+            }
+
+            // List block detection
+            const lines = trimmed.split("\n");
+            const isList = lines.every((l) => /^[-•·]/.test(l.trim()) || /^[A-Z]:/.test(l.trim()));
+            if (isList) {
+              return (
+                <ul key={i} className="space-y-1.5 pl-4">
+                  {lines.map((line, j) => (
+                    <li key={j} className="text-sm text-muted-foreground leading-relaxed flex gap-2">
+                      <span className="text-foreground/40 shrink-0">•</span>
+                      <span>{line.replace(/^[-•·]\s*/, "")}</span>
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+
+            // Regular paragraph
+            return (
+              <p key={i} className="text-sm text-muted-foreground leading-[1.75] whitespace-pre-wrap">
+                {trimmed}
+              </p>
+            );
+          })}
         </div>
       </TabsContent>
 
       {/* Leaderboard tab */}
       <TabsContent value="leaderboard" className="pt-6">
         {leaderboard.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-8 text-center">
-            No approved submissions yet.
-          </p>
+          <div className="text-center py-12">
+            <p className="text-sm text-muted-foreground">No approved submissions yet.</p>
+            <p className="text-xs text-muted-foreground mt-1">Be the first to submit!</p>
+          </div>
         ) : (
-          <div className="rounded-lg border divide-y">
+          <div className="rounded-lg border overflow-hidden">
             {/* Header */}
-            <div className="grid grid-cols-[40px_1fr_100px] px-4 py-3 text-xs uppercase tracking-wider text-muted-foreground">
-              <span>#</span>
+            <div className="grid grid-cols-[48px_1fr_100px] px-5 py-3 text-xs uppercase tracking-wider text-muted-foreground bg-muted/30">
+              <span>Rank</span>
               <span>Solver</span>
               <span className="text-right">Score</span>
             </div>
-            {leaderboard.map((entry, index) => (
-              <div
-                key={entry.id}
-                className={`grid grid-cols-[40px_1fr_100px] px-4 py-3 text-sm items-center ${
-                  entry.isCurrentUser ? "bg-accent/50" : ""
-                }`}
-              >
-                <span className="font-mono text-muted-foreground">
-                  {index + 1}
-                </span>
-                <span className="font-medium">
-                  {entry.workerName}
-                  {entry.isCurrentUser && (
-                    <span className="text-xs text-muted-foreground ml-2">(you)</span>
-                  )}
-                </span>
-                <span className="text-right font-mono font-medium">
-                  {entry.score?.toFixed(4)}
-                </span>
-              </div>
-            ))}
+            <div className="divide-y">
+              {leaderboard.map((entry, index) => (
+                <div
+                  key={entry.id}
+                  className={`grid grid-cols-[48px_1fr_100px] px-5 py-3.5 text-sm items-center transition-colors hover:bg-muted/20 ${
+                    entry.isCurrentUser ? "bg-accent/30 border-l-2 border-l-foreground" : ""
+                  }`}
+                >
+                  <span className="font-mono text-muted-foreground font-medium">
+                    {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1}
+                  </span>
+                  <span className="font-medium">
+                    {entry.workerName}
+                    {entry.isCurrentUser && (
+                      <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">you</Badge>
+                    )}
+                  </span>
+                  <span className="text-right font-mono font-semibold">
+                    {entry.score?.toFixed(4)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </TabsContent>
