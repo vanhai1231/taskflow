@@ -7,6 +7,8 @@ import { ArrowUpRight, Users, Target, Clock } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { closeExpiredTasks } from "@/app/actions/admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function WorkerTaskBoard() {
   const session = await getServerSession(authOptions);
 

@@ -11,6 +11,8 @@ import { TaskTabs } from "./task-tabs";
 import { CountdownBadge } from "@/components/countdown";
 import { closeExpiredTasks } from "@/app/actions/admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function TaskDetailPage({
   params,
 }: {

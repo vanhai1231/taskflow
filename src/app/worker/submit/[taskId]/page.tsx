@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { SubmitResultForm } from "./submit-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function SubmitPage({
   params,
 }: {

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { ReviewForm } from "./review-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function ReviewerSubmissionsPage() {
   const submissions = await prisma.submission.findMany({
     where: {
