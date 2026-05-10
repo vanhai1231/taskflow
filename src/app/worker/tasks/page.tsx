@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ArrowUpRight, Users, Target, Clock } from "lucide-react";
+import { ArrowUpRight, Users, Target, Clock, DollarSign, Trophy } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { closeExpiredTasks } from "@/app/actions/admin";
 
@@ -12,7 +12,6 @@ export const dynamic = "force-dynamic";
 export default async function WorkerTaskBoard() {
   const session = await getServerSession(authOptions);
 
-  // Auto-close expired tasks
   await closeExpiredTasks();
 
   const tasks = await prisma.task.findMany({
@@ -72,59 +71,71 @@ export default async function WorkerTaskBoard() {
               <Link
                 key={task.id}
                 href={`/worker/tasks/${task.id}`}
-                className="group relative block rounded-2xl border bg-card p-0 overflow-hidden transition-all duration-200 hover:border-foreground/20 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-white/5"
+                className="group relative block rounded-2xl border bg-card overflow-hidden transition-all duration-300 hover:border-foreground/20 hover:shadow-xl hover:shadow-white/[0.03] hover:-translate-y-0.5"
               >
-                <div className="h-1 w-full bg-gradient-to-r from-emerald-400 to-emerald-600" />
-
+                {/* Card content */}
                 <div className="p-6 space-y-4">
+                  {/* Header row */}
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="success" className="text-[11px] px-2 py-0.5">
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant="success" className="text-[11px] px-2.5 py-0.5">
                           Open
                         </Badge>
                         {task.deadline && (
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 text-muted-foreground" />
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Clock className="h-3 w-3" />
                             <Countdown deadline={task.deadline.toISOString()} />
                           </div>
                         )}
                       </div>
-                      <h3 className="font-semibold text-base leading-snug group-hover:underline underline-offset-2 decoration-1">
+                      <h3 className="font-semibold text-base leading-snug">
                         {task.title}
                       </h3>
                     </div>
-                    <div className="shrink-0 rounded-full border p-2 text-muted-foreground group-hover:text-foreground group-hover:border-foreground/30 transition-colors">
+                    <div className="shrink-0 rounded-full border p-2 text-muted-foreground group-hover:text-foreground group-hover:border-foreground/30 group-hover:bg-foreground/5 transition-all">
                       <ArrowUpRight className="h-4 w-4" />
                     </div>
                   </div>
 
+                  {/* Description */}
                   <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                    {task.description}
+                    {task.description.replace(/[#*`~>\-]/g, "").substring(0, 150)}...
                   </p>
 
-                  <div className="border-t" />
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                  {/* Stats row */}
+                  <div className={`grid gap-3 pt-3 border-t ${task.rewardAmount > 0 ? "grid-cols-3" : "grid-cols-2"}`}>
+                    <div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                         <Target className="h-3.5 w-3.5" />
-                        <span className="text-[11px] uppercase tracking-wider">Baseline</span>
+                        <span className="text-[10px] uppercase tracking-wider font-medium">Baseline</span>
                       </div>
                       <p className="font-mono text-sm font-semibold">
                         {task.baselineScore.toFixed(2)}
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                    {task.rewardAmount > 0 && (
+                      <div>
+                        <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                          <DollarSign className="h-3.5 w-3.5" />
+                          <span className="text-[10px] uppercase tracking-wider font-medium">Reward</span>
+                        </div>
+                        <p className="text-sm font-semibold">
+                          ${task.rewardAmount.toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                         <Users className="h-3.5 w-3.5" />
-                        <span className="text-[11px] uppercase tracking-wider">Solvers</span>
+                        <span className="text-[10px] uppercase tracking-wider font-medium">Solvers</span>
                       </div>
                       <p className="text-sm font-semibold">
                         {task._count.submissions}
                         {topScore !== null && (
                           <span className="text-muted-foreground font-normal text-xs ml-1">
-                            · best {topScore.toFixed(2)}
+                            <Trophy className="h-3 w-3 inline -mt-0.5 mr-0.5" />
+                            {topScore.toFixed(2)}
                           </span>
                         )}
                       </p>
