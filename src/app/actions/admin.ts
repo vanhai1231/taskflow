@@ -46,6 +46,39 @@ export async function createTask(formData: FormData) {
   revalidatePath("/worker/tasks");
 }
 
+export async function updateTask(taskId: string, formData: FormData) {
+  await requireAdmin();
+
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const datasetUrl = formData.get("datasetUrl") as string;
+  const baselineScore = parseFloat(formData.get("baselineScore") as string);
+  const rewardAmount = parseFloat(formData.get("rewardAmount") as string);
+  const expectedPayout = formData.get("expectedPayout") as string;
+  const deadline = formData.get("deadline") as string;
+
+  if (!title || !description) {
+    throw new Error("Title and description are required");
+  }
+
+  await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      title,
+      description,
+      datasetUrl: datasetUrl || undefined,
+      baselineScore: baselineScore || 0,
+      rewardAmount: rewardAmount || 0,
+      expectedPayout: expectedPayout ? new Date(expectedPayout) : null,
+      deadline: deadline ? new Date(deadline) : null,
+    },
+  });
+
+  revalidatePath("/admin/tasks");
+  revalidatePath("/worker/tasks");
+  revalidatePath(`/worker/tasks/${taskId}`);
+}
+
 // Auto-close expired tasks (called on page load)
 export async function closeExpiredTasks() {
   await prisma.task.updateMany({

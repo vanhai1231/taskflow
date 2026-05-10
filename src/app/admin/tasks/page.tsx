@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CreateTaskForm } from "./create-task-form";
+import { EditTaskForm } from "./edit-task-form";
 import { TaskStatusToggle } from "./task-status-toggle";
 
 export default async function AdminTasksPage() {
@@ -80,7 +81,19 @@ export default async function AdminTasksPage() {
                   {task._count.submissions}
                 </TableCell>
                 <TableCell className="text-right">
-                  <TaskStatusToggle taskId={task.id} currentStatus={task.status} />
+                  <div className="flex items-center justify-end gap-1">
+                    <EditTaskForm task={{
+                      id: task.id,
+                      title: task.title,
+                      description: task.description,
+                      datasetUrl: task.datasetUrl,
+                      baselineScore: task.baselineScore,
+                      rewardAmount: task.rewardAmount,
+                      deadline: task.deadline?.toISOString() || null,
+                      expectedPayout: task.expectedPayout?.toISOString() || null,
+                    }} />
+                    <TaskStatusToggle taskId={task.id} currentStatus={task.status} />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
