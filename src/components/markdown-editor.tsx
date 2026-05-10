@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Bold, Italic, Strikethrough, Code, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Minus, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -82,7 +82,7 @@ export function MarkdownEditor({ name, defaultValue = "", rows = 8, required, pl
 
   const renderInline = (text: string) => {
     // Simple inline markdown rendering
-    const parts: (string | JSX.Element)[] = [];
+    const parts: React.ReactNode[] = [];
     let remaining = text;
     let key = 0;
 
