@@ -5,7 +5,7 @@ import { updateTask } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { MarkdownEditor } from "@/components/markdown-editor";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle, DialogTrigger,
@@ -92,8 +92,8 @@ export function EditTaskForm({ task }: { task: TaskData }) {
             <Input id={`title-${task.id}`} name="title" defaultValue={task.title} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`desc-${task.id}`}>Description</Label>
-            <Textarea id={`desc-${task.id}`} name="description" defaultValue={task.description} rows={8} required />
+            <Label>Description</Label>
+            <MarkdownEditor name="description" defaultValue={task.description} rows={10} required placeholder="Describe the task..." />
           </div>
           <div className="space-y-2">
             <Label>Dataset</Label>

@@ -5,7 +5,7 @@ import { createTask } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { MarkdownEditor } from "@/components/markdown-editor";
 import {
   Dialog,
   DialogContent,
@@ -80,8 +80,8 @@ export function CreateTaskForm() {
             <Input id="title" name="title" placeholder="Task title" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" placeholder="Describe the task..." rows={4} required />
+            <Label>Description</Label>
+            <MarkdownEditor name="description" rows={6} required placeholder="Describe the task using markdown..." />
           </div>
           <div className="space-y-2">
             <Label>Dataset</Label>

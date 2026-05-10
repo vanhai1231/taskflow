@@ -3,6 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 import Link from "next/link";
 
 interface SubmissionSummary {
@@ -51,22 +52,22 @@ export function TaskTabs({
 
   return (
     <Tabs defaultValue="description" className="w-full">
-      <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 h-auto">
+      <TabsList className="w-full grid grid-cols-3 rounded-none border-b bg-transparent p-0 h-auto">
         <TabsTrigger
           value="description"
-          className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 text-sm"
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2 text-sm"
         >
           Description
         </TabsTrigger>
         <TabsTrigger
           value="leaderboard"
-          className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 text-sm"
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2 text-sm"
         >
           Leaderboard ({leaderboard.length})
         </TabsTrigger>
         <TabsTrigger
           value="my-submission"
-          className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 text-sm"
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2 text-sm"
         >
           Your Submissions
         </TabsTrigger>
@@ -74,44 +75,7 @@ export function TaskTabs({
 
       {/* Description tab */}
       <TabsContent value="description" className="pt-6">
-        <div className="max-w-none space-y-4">
-          {description.split("\n\n").map((block, i) => {
-            const trimmed = block.trim();
-            if (!trimmed) return null;
-
-            // Heading detection
-            if (trimmed.length < 60 && !trimmed.includes(".") && !trimmed.startsWith("-") && !trimmed.startsWith("•")) {
-              return (
-                <h3 key={i} className="text-base font-semibold mt-6 mb-2 text-foreground">
-                  {trimmed}
-                </h3>
-              );
-            }
-
-            // List block detection
-            const lines = trimmed.split("\n");
-            const isList = lines.every((l) => /^[-•·]/.test(l.trim()) || /^[A-Z]:/.test(l.trim()));
-            if (isList) {
-              return (
-                <ul key={i} className="space-y-1.5 pl-4">
-                  {lines.map((line, j) => (
-                    <li key={j} className="text-sm text-muted-foreground leading-relaxed flex gap-2">
-                      <span className="text-foreground/40 shrink-0">•</span>
-                      <span>{line.replace(/^[-•·]\s*/, "")}</span>
-                    </li>
-                  ))}
-                </ul>
-              );
-            }
-
-            // Regular paragraph
-            return (
-              <p key={i} className="text-sm text-muted-foreground leading-[1.75] whitespace-pre-wrap">
-                {trimmed}
-              </p>
-            );
-          })}
-        </div>
+        <MarkdownRenderer content={description} />
       </TabsContent>
 
       {/* Leaderboard tab */}
